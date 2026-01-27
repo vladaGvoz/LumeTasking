@@ -1,11 +1,19 @@
 <resources>
-    <color name="screenBackground">#FFF176</color> <!-- darker yellow -->
-    <color name="primaryText">#4A148C</color>      <!-- dark purple -->
-    <color name="secondaryText">#6A1B9A</color>    <!-- lighter purple -->
+    <color name="screenBackground">#FFF176</color>
+    <color name="primaryText">#4A148C</color>
+    <color name="secondaryText">#6A1B9A</color>
+
     <color name="buttonBackground">#4A148C</color>
     <color name="buttonText">#FFF9C4</color>
+
     <color name="fabColor">#4A148C</color>
     <color name="fabIconColor">#FFF9C4</color>
+
     <color name="card_background">#FFF9C4</color>
     <color name="card_border">#800080</color>
+
+    <color name="overdue_red">#D32F2F</color>
+
+    <color name="normal_text">#4A148C</color>
+    <color name="secondary_text">#6A1B9A</color>
 </resources>

@@ -1,11 +1,20 @@
 <resources>
-    <color name="screenBackground">#4A148C</color> <!-- dark purple -->
-    <color name="primaryText">#FFC107</color>      <!-- yellow -->
-    <color name="secondaryText">#FFD54F</color>    <!-- lighter yellow -->
+    <!-- Backgrounds -->
+    <color name="screenBackground">#2A0F4F</color> <!-- very dark purple -->
+    <color name="card_background">#3A1568</color>  <!-- slightly lighter purple -->
+
+    <!-- Text -->
+    <color name="primaryText">#FFECB3</color>      <!-- soft warm yellow -->
+    <color name="secondaryText">#FFD54F</color>    <!-- muted yellow -->
+
+    <!-- Buttons -->
     <color name="buttonBackground">#FFD54F</color>
-    <color name="buttonText">#4A148C</color>
+    <color name="buttonText">#2A0F4F</color>
+
+    <!-- FAB -->
     <color name="fabColor">#FFD54F</color>
-    <color name="fabIconColor">#4A148C</color>
-    <color name="card_background">#4A148C</color> <!-- darker purple -->
-    <color name="card_border">#BB86FC</color>
+    <color name="fabIconColor">#2A0F4F</color>
+
+    <!-- Accents -->
+    <color name="card_border">#9575CD</color>      <!-- softer purple accent -->
 </resources>

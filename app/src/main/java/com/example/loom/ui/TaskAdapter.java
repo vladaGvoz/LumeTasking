@@ -2,6 +2,7 @@ package com.example.loom.ui;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,26 +26,6 @@ import java.util.List;
 @SuppressWarnings("ClassEscapesDefinedScope")
 public class TaskAdapter extends ListAdapter<Task, TaskAdapter.TaskViewHolder> {
 
-    private boolean selectionMode = false;
-    private final SparseBooleanArray selectedItems = new SparseBooleanArray();
-
-    private OnItemClickListener listener;
-
-    public interface OnItemClickListener {
-        void onItemClick(Task task);
-        void onItemCheckChanged(Task task, boolean isChecked);
-        void onItemLongClick(Task task);
-        void onSelectionCountChanged(int count);
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
-    }
-
-    public TaskAdapter() {
-        super(DIFF_CALLBACK);
-    }
-
     private static final DiffUtil.ItemCallback<Task> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<>() {
                 @Override
@@ -60,7 +41,17 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.TaskViewHolder> {
                             oldItem.getDueDate() == newItem.getDueDate();
                 }
             };
+    private final SparseBooleanArray selectedItems = new SparseBooleanArray();
+    private boolean selectionMode = false;
+    private OnItemClickListener listener;
 
+    public TaskAdapter() {
+        super(DIFF_CALLBACK);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public void toggleSelection(int position) {
         if (selectedItems.get(position, false)) {
@@ -77,6 +68,8 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.TaskViewHolder> {
         }
     }
 
+    // ---------------- Selection ----------------
+
     @SuppressLint("NotifyDataSetChanged")
     public void clearSelection() {
         selectedItems.clear();
@@ -85,21 +78,17 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.TaskViewHolder> {
         if (listener != null) listener.onSelectionCountChanged(0);
     }
 
-    public boolean isSelectionMode() { return selectionMode; }
+    public boolean isSelectionMode() {
+        return selectionMode;
+    }
 
     public List<Task> getSelectedTasks() {
         List<Task> tasks = new ArrayList<>();
         for (int i = 0; i < selectedItems.size(); i++) {
-            int pos = selectedItems.keyAt(i);
-            tasks.add(getItem(pos));
+            tasks.add(getItem(selectedItems.keyAt(i)));
         }
         return tasks;
     }
-
-    public void cancelSelection() {
-        clearSelection();
-    }
-
 
     @NonNull
     @Override
@@ -109,45 +98,99 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.TaskViewHolder> {
         return new TaskViewHolder(v);
     }
 
+    // ---------------- Adapter ----------------
+
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task task = getItem(position);
 
-        // Remove listener to avoid unwanted triggers
-        holder.checkBox.setOnCheckedChangeListener(null);
+        boolean isCompleted = task.isCompleted();
+        boolean overdue = isOverdue(task);
+        boolean isSelected = selectedItems.get(position, false);
 
-        holder.checkBox.setChecked(task.isCompleted());
+        if (isSelected) {
+            holder.itemView.setBackgroundColor(Color.parseColor("#FFF59D"));
+        } else if (overdue) {
+            holder.itemView.setBackgroundColor(Color.parseColor("#33D32F2F"));
+        } else if (isCompleted) {
+            holder.itemView.setBackgroundColor(Color.parseColor("#143A1568"));
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+        holder.itemView.setAlpha(isCompleted ? 0.75f : 1f);
+
+        // title
         holder.titleTextView.setText(task.getTitle());
+        if (isCompleted) {
+            holder.titleTextView.setPaintFlags(
+                    holder.titleTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
+            );
+        } else {
+            holder.titleTextView.setPaintFlags(
+                    holder.titleTextView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG
+            );
+        }
 
-        // Description preview
+
+        // COLORI
+        int normalTitleColor = holder.itemView.getContext().getColor(R.color.primaryText);
+        int normalDescColor = holder.itemView.getContext().getColor(R.color.secondaryText);
+        int overdueColor = holder.itemView.getContext().getColor(R.color.overdue_red);
+        int fadedPurple = Color.parseColor("#AA9575CD"); // 67% opacity purple
+
+
+        holder.titleTextView.setTextColor(
+                isCompleted ? fadedPurple
+                        : overdue ? overdueColor
+                        : normalTitleColor
+        );
+
+        // desc
         String desc = task.getDescription();
+        int color = isCompleted ? fadedPurple
+                : overdue ? overdueColor
+                : normalDescColor;
         if (desc != null && !desc.isEmpty()) {
             holder.descriptionPreview.setVisibility(View.VISIBLE);
             holder.descriptionPreview.setText(desc);
+            holder.descriptionPreview.setTextColor
+                    (color);
         } else {
             holder.descriptionPreview.setVisibility(View.GONE);
         }
 
         DateFormat df = DateFormat.getDateInstance();
         holder.dueTextView.setText("Due: " + df.format(new Date(task.getDueDate())));
-
-        // highlight
-        holder.itemView.setBackgroundColor(
-                selectedItems.get(position, false)
-                        ? Color.parseColor("#FFF59D")   // pale yellow selection
-                        : Color.TRANSPARENT
+        holder.dueTextView.setTextColor(
+                color
         );
 
-        holder.checkBox.setOnCheckedChangeListener((b, isChecked) -> {
+        // checkbox
+        holder.checkBox.setOnCheckedChangeListener(null);
+        holder.checkBox.setChecked(isCompleted);
+        holder.checkBox.setOnCheckedChangeListener((b, checked) -> {
             if (!selectionMode && listener != null) {
-                listener.onItemCheckChanged(task, isChecked);
+                listener.onItemCheckChanged(task, checked);
             }
         });
     }
 
+    private boolean isOverdue(Task task) {
+        return !task.isCompleted() && task.getDueDate() < System.currentTimeMillis();
+    }
 
-    // VIEW HOLDER
+    public interface OnItemClickListener {
+        void onItemClick(Task task);
+
+        void onItemCheckChanged(Task task, boolean isChecked);
+
+        void onItemLongClick(Task task);
+
+        void onSelectionCountChanged(int count);
+    }
+
     class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView, dueTextView, descriptionPreview;
         CheckBox checkBox;
@@ -171,7 +214,6 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.TaskViewHolder> {
                 }
             });
 
-
             itemView.setOnLongClickListener(v -> {
                 int pos = getAdapterPosition();
                 if (pos == RecyclerView.NO_POSITION) return true;
@@ -185,4 +227,6 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.TaskViewHolder> {
             });
         }
     }
+
+
 }
