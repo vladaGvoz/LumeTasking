@@ -22,6 +22,9 @@ import android.widget.Toast;
 import com.example.loom.R;
 import com.example.loom.model.Task;
 import com.example.loom.viewmodel.TaskViewModel;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.Calendar;
 
@@ -34,6 +37,8 @@ public class TaskDetailFragment extends Fragment {
     private EditText editTextDescription;
     private EditText editTextDate;
     private Button buttonSave;
+
+    private AdView adView; // AdView reference
 
     private int taskId = -1;
     private long dueDate = 0;
@@ -59,6 +64,17 @@ public class TaskDetailFragment extends Fragment {
         editTextDate = view.findViewById(R.id.edit_text_task_date);
         buttonSave = view.findViewById(R.id.button_save_task);
 
+        // Initialize Mobile Ads
+        MobileAds.initialize(requireContext(), initializationStatus -> {});
+
+        // Set up AdView
+        adView = view.findViewById(R.id.ad_banner);
+        if (adView != null) {
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adView.loadAd(adRequest);
+        }
+
+        // Date picker
         editTextDate.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             int y = calendar.get(Calendar.YEAR);
@@ -70,7 +86,6 @@ public class TaskDetailFragment extends Fragment {
                         String date = dayOfMonth + "/" + (month + 1) + "/" + year;
                         editTextDate.setText(date);
 
-                        // store selected date as millis
                         Calendar picked = Calendar.getInstance();
                         picked.set(year, month, dayOfMonth, 0, 0, 0);
                         dueDate = picked.getTimeInMillis();
@@ -81,6 +96,7 @@ public class TaskDetailFragment extends Fragment {
             dialog.show();
         });
 
+        // Load existing task if editing
         if (getArguments() != null && getArguments().containsKey("taskId")) {
             int id = getArguments().getInt("taskId", -1);
             if (id != -1) {

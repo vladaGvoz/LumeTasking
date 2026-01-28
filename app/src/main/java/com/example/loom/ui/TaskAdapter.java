@@ -149,14 +149,13 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.TaskViewHolder> {
 
         // desc
         String desc = task.getDescription();
-        int color = isCompleted ? fadedPurple
-                : overdue ? overdueColor
-                : normalDescColor;
         if (desc != null && !desc.isEmpty()) {
             holder.descriptionPreview.setVisibility(View.VISIBLE);
             holder.descriptionPreview.setText(desc);
             holder.descriptionPreview.setTextColor
-                    (color);
+                    (isCompleted ? fadedPurple
+                        : overdue ? overdueColor
+                        : normalDescColor);
         } else {
             holder.descriptionPreview.setVisibility(View.GONE);
         }
@@ -164,7 +163,9 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.TaskViewHolder> {
         DateFormat df = DateFormat.getDateInstance();
         holder.dueTextView.setText("Due: " + df.format(new Date(task.getDueDate())));
         holder.dueTextView.setTextColor(
-                color
+                isCompleted ? fadedPurple
+                        : overdue ? overdueColor
+                        : normalDescColor
         );
 
         // checkbox

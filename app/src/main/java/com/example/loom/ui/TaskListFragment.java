@@ -2,6 +2,7 @@ package com.example.loom.ui;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,12 +21,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.loom.R;
 import com.example.loom.model.Task;
 import com.example.loom.viewmodel.TaskViewModel;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
 public class TaskListFragment extends Fragment {
+
+    private final static  String TAG = "TaskListFragment";
 
     private TaskViewModel taskViewModel;
     private TaskAdapter taskAdapter;
@@ -42,7 +48,22 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_task_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_task_list, container, false);
+
+        MobileAds.initialize(requireContext(), initializationStatus -> {});
+
+        AdView adView = view.findViewById(R.id.ad_banner);
+        if (adView != null) {
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adView.loadAd(adRequest);
+        } else {
+            Log.e(TAG, "AdView is null! Check your fragment layout.");
+        }
+
+        return view;
+
+
+
     }
 
     @Override

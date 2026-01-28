@@ -69,16 +69,12 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Ad Banner -->
-    <TextView
-        android:id="@+id/ad_banner_placeholder"
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/ad_banner"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:gravity="center"
-        android:text="Ad Banner Placeholder"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:alpha="0.5"
-        android:background="#DDDDDD"
+        android:layout_height="wrap_content"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111"
         app:layout_constraintTop_toBottomOf="@id/selectionToolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -91,7 +87,7 @@
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/ad_banner_placeholder"
+        app:layout_constraintTop_toBottomOf="@id/ad_banner"
         app:layout_constraintBottom_toTopOf="@id/fab_add_task"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
