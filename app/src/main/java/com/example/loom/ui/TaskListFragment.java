@@ -42,6 +42,7 @@ public class TaskListFragment extends Fragment {
     private TextView tvSelectedCount;
     private FloatingActionButton fab;
 
+    private AdView adView;
     public TaskListFragment() { }
 
     @Override
@@ -50,9 +51,7 @@ public class TaskListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_task_list, container, false);
 
-        MobileAds.initialize(requireContext(), initializationStatus -> {});
-
-        AdView adView = view.findViewById(R.id.ad_banner);
+        adView = view.findViewById(R.id.ad_banner);
         if (adView != null) {
             AdRequest adRequest = new AdRequest.Builder().build();
             adView.loadAd(adRequest);
@@ -187,5 +186,23 @@ public class TaskListFragment extends Fragment {
             snackbar.show();
         });
 
+    }
+
+    @Override
+    public void onPause() {
+        if (adView != null) adView.pause();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adView != null) adView.resume();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (adView != null) adView.destroy();
+        super.onDestroy();
     }
 }

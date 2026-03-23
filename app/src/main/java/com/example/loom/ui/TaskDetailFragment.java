@@ -65,8 +65,6 @@ public class TaskDetailFragment extends Fragment {
         buttonSave = view.findViewById(R.id.button_save_task);
 
         // Initialize Mobile Ads
-        MobileAds.initialize(requireContext(), initializationStatus -> {});
-
         // Set up AdView
         adView = view.findViewById(R.id.ad_banner);
         if (adView != null) {
@@ -162,5 +160,23 @@ public class TaskDetailFragment extends Fragment {
         }
 
         navController.popBackStack();
+    }
+
+    @Override
+    public void onPause() {
+        if (adView != null) adView.pause();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adView != null) adView.resume();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (adView != null) adView.destroy();
+        super.onDestroy();
     }
 }
